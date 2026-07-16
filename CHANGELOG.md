@@ -7,6 +7,26 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- **M5 — Human-in-the-loop approval**
+  - Auditor node (`src/agents/auditor.py`): deterministically applies the human
+    reviewer's `approved`/`denied` decision to the escalated refund. Approved
+    refunds finalize via `execute_approved_refund` (audited as
+    `success_after_approval`); denials move no money.
+  - Interrupt/resume flow: the graph suspends before the auditor
+    (`interrupt_before`), persists state, and resumes on a human decision — so
+    approvals survive process restarts.
+  - Injectable checkpointer and supervisor router (`compile_workflow`) so the
+    full submit → suspend → approve/deny path runs and is tested offline with an
+    in-memory saver.
+  - `WorkflowService` (`src/workflow_service.py`) encapsulating submit / pending
+    / resume behind one storage-agnostic surface.
+  - FastAPI endpoints wired end-to-end: `POST /tickets`, `GET /pending`,
+    `POST /approve`, with a startup lifespan that provisions the Postgres-backed
+    service and 503s gracefully when no database is reachable.
+  - Offline test coverage for the auditor, the end-to-end workflow, and the API
+    (65 tests, +1 skipped integration).
+  - ADR 0008 — human-in-the-loop approval via interrupt/resume.
+
 - **M4 — Worker agents & pgvector RAG**
   - Billing worker (`src/agents/billing.py`): deterministic money specialist that
     extracts the refund amount, calls the sandboxed `execute_refund` tool, and

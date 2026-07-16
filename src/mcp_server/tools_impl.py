@@ -131,3 +131,25 @@ def execute_refund(
         tool="execute_refund", arguments=args, result_status="success", user_id=user_id
     )
     return RefundResult(status="success", user_id=user_id, amount=amount, transaction_id=txn_id)
+
+
+def execute_approved_refund(
+    user_id: str, amount: float, idempotency_key: str | None = None
+) -> RefundResult:
+    """Finalize a refund that a human auditor has already approved.
+
+    This bypasses the auto-approve limit **because the governance gate has
+    already been satisfied by a human decision** (recorded in the audit trail as
+    ``success_after_approval``). It is called only by the auditor node after an
+    ``approved`` decision, never directly by a worker.
+    """
+    args = {
+        "user_id": user_id, "amount": amount,
+        "idempotency_key": idempotency_key, "approved_by": "human",
+    }
+    txn_id = f"txn_{datetime.now(UTC).timestamp()}"
+    audit_log.record(
+        tool="execute_refund", arguments=args,
+        result_status="success_after_approval", user_id=user_id,
+    )
+    return RefundResult(status="success", user_id=user_id, amount=amount, transaction_id=txn_id)

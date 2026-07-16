@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+from typing import Literal
+
 from pydantic import BaseModel, Field
 
 
@@ -29,7 +31,9 @@ class ApprovalRequest(BaseModel):
     """Human decision on a suspended high-value action."""
 
     thread_id: str
-    decision: str = Field(..., description="'approved' or 'denied'")
+    decision: Literal["approved", "denied"] = Field(
+        ..., description="Reviewer's decision on the escalated refund."
+    )
 
 
 class HealthResponse(BaseModel):

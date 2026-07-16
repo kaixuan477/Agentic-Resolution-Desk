@@ -1,14 +1,15 @@
 """LangGraph wiring: nodes, conditional routing, and the Postgres checkpointer.
 
-M1 scope: the graph compiles and persists state durably. Node bodies are
-minimal placeholders that will be fleshed out in M3–M5 (routing, workers,
-human-in-the-loop). The structure — entry point, conditional edges, and the
-``interrupt_before`` auditor gate — is already in place so later milestones
-only fill in behavior, not plumbing.
+The topology — entry point, conditional edges, and the ``interrupt_before``
+auditor gate — establishes durable, resumable multi-agent execution. All node
+bodies are real as of M5 (routing, workers, and the human-in-the-loop auditor).
+The checkpointer is injectable so the whole workflow runs and is tested offline
+with an in-memory saver, while production uses durable Postgres.
 """
 
 from __future__ import annotations
 
+import functools
 from collections.abc import Iterator
 from contextlib import contextmanager
 from typing import Any
@@ -17,19 +18,12 @@ from langgraph.checkpoint.postgres import PostgresSaver
 from langgraph.graph import END, StateGraph
 from psycopg_pool import ConnectionPool
 
+from src.agents.auditor import auditor_node
 from src.agents.billing import billing_node
-from src.agents.supervisor import supervisor_node
+from src.agents.supervisor import StructuredRouter, supervisor_node
 from src.agents.support import support_node
 from src.config import get_settings
 from src.state import ResolutionState
-
-
-# --------------------------------------------------------------------------- #
-# Auditor placeholder (human-in-the-loop behavior lands in M5).
-# --------------------------------------------------------------------------- #
-def auditor_node(state: ResolutionState) -> dict[str, Any]:
-    """Human-in-the-loop approval gate. Suspended via ``interrupt_before`` in M5."""
-    return {"current_assignee": "auditor"}
 
 
 # --------------------------------------------------------------------------- #
@@ -49,11 +43,21 @@ def route_from_billing(state: ResolutionState) -> str:
     return "auditor" if state.requires_approval else END
 
 
-def build_workflow() -> StateGraph:
-    """Assemble the graph topology (uncompiled)."""
+def build_workflow(router: StructuredRouter | None = None) -> StateGraph:
+    """Assemble the graph topology (uncompiled).
+
+    An optional ``router`` is bound to the supervisor node so tests can run the
+    whole graph offline with a deterministic classifier; production leaves it
+    ``None`` and the supervisor uses the LLM.
+    """
     workflow = StateGraph(ResolutionState)
 
-    workflow.add_node("supervisor", supervisor_node)
+    supervisor = (
+        functools.partial(supervisor_node, router=router)
+        if router is not None
+        else supervisor_node
+    )
+    workflow.add_node("supervisor", supervisor)
     workflow.add_node("billing", billing_node)
     workflow.add_node("support", support_node)
     workflow.add_node("auditor", auditor_node)
@@ -76,6 +80,20 @@ def build_workflow() -> StateGraph:
     return workflow
 
 
+def compile_workflow(checkpointer: Any, router: StructuredRouter | None = None) -> Any:
+    """Compile the graph against any LangGraph checkpointer.
+
+    Kept separate from ``compiled_app`` so tests and the API can supply an
+    in-memory saver (offline) while production supplies durable Postgres. The
+    ``interrupt_before=["auditor"]`` clause is what suspends execution for human
+    approval.
+    """
+    return build_workflow(router=router).compile(
+        checkpointer=checkpointer,
+        interrupt_before=["auditor"],
+    )
+
+
 @contextmanager
 def compiled_app() -> Iterator[object]:
     """Yield a compiled graph backed by a durable Postgres checkpointer.
@@ -89,10 +107,7 @@ def compiled_app() -> Iterator[object]:
     try:
         checkpointer = PostgresSaver(pool)  # type: ignore[arg-type]
         checkpointer.setup()  # idempotent; creates checkpoint tables if absent
-        app = build_workflow().compile(
-            checkpointer=checkpointer,
-            interrupt_before=["auditor"],
-        )
+        app = compile_workflow(checkpointer)
         yield app
     finally:
         pool.close()

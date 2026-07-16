@@ -91,9 +91,9 @@ ruff check src tests
 
 ## Project status — building toward v1.0
 
-Current milestone: **M5 — Human-in-the-loop approval**. M1–M4 (foundations,
-tool-server hardening, structured-output supervisor routing, and the worker
-agents with pgvector RAG) are done.
+Current milestone: **M6 — Approval dashboard**. M1–M5 (foundations,
+tool-server hardening, structured-output supervisor routing, worker agents with
+pgvector RAG, and human-in-the-loop approval) are done.
 
 | Milestone | Scope | Status |
 |---|---|---|
@@ -101,8 +101,8 @@ agents with pgvector RAG) are done.
 | M2 | MCP tool server hardening | ✅ done |
 | M3 | Supervisor routing (structured output) | ✅ done |
 | M4 | Worker agents + pgvector RAG | ✅ done |
-| M5 | Human-in-the-loop approval | 🚧 in progress |
-| M6 | Approval dashboard | ⬜ |
+| M5 | Human-in-the-loop approval | ✅ done |
+| M6 | Approval dashboard | 🚧 in progress |
 | M7 | Audit + polish → `v1.0.0` | ⬜ |
 
 See [CHANGELOG.md](CHANGELOG.md) for released changes.
