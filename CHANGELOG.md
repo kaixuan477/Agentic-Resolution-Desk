@@ -23,4 +23,4 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Smoke tests for state schema, graph topology, and MCP tools.
   - Architecture Decision Records 0001–0004.
 
-[Unreleased]: https://github.com/kaixuan477/resolution-desk/commits/main
+[Unreleased]: https://github.com/kaixuan477/Agentic-Resolution-Desk/commits/main

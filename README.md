@@ -2,8 +2,8 @@
 
 > Multi-agent customer-support automation with **sandboxed tool execution**, **durable state**, and **human-in-the-loop governance**.
 
-[![CI](https://github.com/kaixuan477/resolution-desk/actions/workflows/ci.yml/badge.svg)](https://github.com/kaixuan477/resolution-desk/actions/workflows/ci.yml)
-![Python](https://img.shields.io/badge/python-3.11-blue)
+[![CI](https://github.com/kaixuan477/Agentic-Resolution-Desk/actions/workflows/ci.yml/badge.svg)](https://github.com/kaixuan477/Agentic-Resolution-Desk/actions/workflows/ci.yml)
+![Python](https://img.shields.io/badge/python-3.12-blue)
 ![License](https://img.shields.io/badge/license-MIT-green)
 
 A supervisor agent routes incoming support tickets to specialized worker agents
@@ -91,13 +91,13 @@ ruff check src tests
 
 ## Project status — building toward v1.0
 
-Current milestone: **M1 — Foundations & infra** (repo scaffold, typed state,
-graph topology, Postgres checkpointer wiring, MCP tool server, CI).
+Current milestone: **M2 — MCP tool server hardening** (typed tool contracts,
+central governance policy, and the audit foundation). M1 foundations are done.
 
 | Milestone | Scope | Status |
 |---|---|---|
-| M1 | Foundations & infra | ✅ in progress |
-| M2 | MCP tool server hardening | ⬜ |
+| M1 | Foundations & infra | ✅ done |
+| M2 | MCP tool server hardening | 🚧 in progress |
 | M3 | Supervisor routing (structured output) | ⬜ |
 | M4 | Worker agents + pgvector RAG | ⬜ |
 | M5 | Human-in-the-loop approval | ⬜ |
