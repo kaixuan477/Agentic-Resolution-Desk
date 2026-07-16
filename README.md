@@ -91,15 +91,16 @@ ruff check src tests
 
 ## Project status — building toward v1.0
 
-Current milestone: **M3 — Supervisor routing** (structured-output intent
-classification). M1 foundations and M2 tool-server hardening are done.
+Current milestone: **M4 — Worker agents + pgvector RAG**. M1–M3 (foundations,
+tool-server hardening, and structured-output supervisor routing) are done.
 
 | Milestone | Scope | Status |
 |---|---|---|
 | M1 | Foundations & infra | ✅ done |
 | M2 | MCP tool server hardening | ✅ done |
-| M3 | Supervisor routing (structured output) | 🚧 in progress |
-| M4 | Worker agents + pgvector RAG | ⬜ |
+| M3 | Supervisor routing (structured output) | ✅ done |
+| M4 | Worker agents + pgvector RAG | 🚧 in progress |
+| M4 | Worker agents + pgvector RAG | 🚧 in progress |
 | M5 | Human-in-the-loop approval | ⬜ |
 | M6 | Approval dashboard | ⬜ |
 | M7 | Audit + polish → `v1.0.0` | ⬜ |

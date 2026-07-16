@@ -7,6 +7,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- **M3 — Supervisor routing (structured output)**
+  - Supervisor/router agent (`src/agents/supervisor.py`) that constrains the LLM
+    to emit a typed `RoutingDecision` (intent + user id + reasoning) instead of
+    free-form text.
+  - Injectable `StructuredRouter` seam so routing is unit-tested fully offline
+    with a deterministic fake — no network, no API cost.
+  - Deterministic `extract_user_id` regex fallback that backfills the id when the
+    LLM omits it.
+  - Real supervisor node wired into the graph, replacing the M1 placeholder.
+  - Routing regression suite over a labeled request set (billing/support/unknown)
+    plus node-level state assertions (37 tests total).
+  - ADR 0006 — structured-output routing.
+
 - **M2 — MCP tool server hardening & audit foundation**
   - Central deterministic governance policy (`src/policy.py`) as the single
     source of truth for the refund auto-approve threshold.

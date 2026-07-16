@@ -17,6 +17,7 @@ from langgraph.checkpoint.postgres import PostgresSaver
 from langgraph.graph import END, StateGraph
 from psycopg_pool import ConnectionPool
 
+from src.agents.supervisor import supervisor_node
 from src.config import get_settings
 from src.state import ResolutionState
 
@@ -24,11 +25,6 @@ from src.state import ResolutionState
 # --------------------------------------------------------------------------- #
 # Node placeholders (behavior arrives in later milestones).
 # --------------------------------------------------------------------------- #
-def supervisor_node(state: ResolutionState) -> dict[str, Any]:
-    """Triage/routing node. M3 will add structured-output intent classification."""
-    return {"current_assignee": state.current_assignee}
-
-
 def billing_node(state: ResolutionState) -> dict[str, Any]:
     """Billing worker. M4 binds MCP tools; M5 wires the approval gate."""
     return {"current_assignee": "billing"}
