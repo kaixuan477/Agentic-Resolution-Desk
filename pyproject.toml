@@ -46,6 +46,9 @@ select = ["E", "F", "I", "UP", "B", "SIM"]
 asyncio_mode = "auto"
 asyncio_default_fixture_loop_scope = "function"
 testpaths = ["tests"]
+markers = [
+    "integration: tests that require a live Postgres database (skipped offline)",
+]
 
 [tool.mypy]
 python_version = "3.12"

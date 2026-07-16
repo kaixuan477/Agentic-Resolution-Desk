@@ -7,6 +7,28 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- **M4 — Worker agents & pgvector RAG**
+  - Billing worker (`src/agents/billing.py`): deterministic money specialist that
+    extracts the refund amount, calls the sandboxed `execute_refund` tool, and
+    escalates over-limit refunds to the auditor with a typed `ProposedAction`.
+  - Support worker (`src/agents/support.py`): RAG specialist answering policy
+    questions; holds only the retriever (no refund capability — least privilege).
+  - Policy corpus (`src/rag/policies.py`) and a `PolicyRetriever` protocol with
+    two implementations: `InMemoryRetriever` (offline lexical) and
+    `PgVectorRetriever` (production, lazy-imported).
+  - Injectable `Answerer` (extractive offline / LLM in production) so the whole
+    workflow runs and is tested with no network, database, or API key.
+  - pgvector ingestion (`src/rag/ingest.py`) + `scripts/seed_policies.py` CLI.
+  - Tool bodies refactored into pure `src/mcp_server/tools_impl.py`; `server.py`
+    now only registers them over MCP, so workers import tools with least
+    privilege.
+  - Real billing/support nodes wired into the graph, replacing placeholders;
+    billing→auditor is now conditional on `requires_approval`.
+  - Integration seam (`tests/test_integration.py`, skip-if-no-DB) and durability
+    smoke script (`scripts/smoke_durability.py`) proving state survives across
+    processes. 52 unit tests (+ 1 skipped integration).
+  - ADR 0007 — worker least-privilege and injectable RAG retriever.
+
 - **M3 — Supervisor routing (structured output)**
   - Supervisor/router agent (`src/agents/supervisor.py`) that constrains the LLM
     to emit a typed `RoutingDecision` (intent + user id + reasoning) instead of

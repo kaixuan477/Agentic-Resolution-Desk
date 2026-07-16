@@ -17,24 +17,16 @@ from langgraph.checkpoint.postgres import PostgresSaver
 from langgraph.graph import END, StateGraph
 from psycopg_pool import ConnectionPool
 
+from src.agents.billing import billing_node
 from src.agents.supervisor import supervisor_node
+from src.agents.support import support_node
 from src.config import get_settings
 from src.state import ResolutionState
 
 
 # --------------------------------------------------------------------------- #
-# Node placeholders (behavior arrives in later milestones).
+# Auditor placeholder (human-in-the-loop behavior lands in M5).
 # --------------------------------------------------------------------------- #
-def billing_node(state: ResolutionState) -> dict[str, Any]:
-    """Billing worker. M4 binds MCP tools; M5 wires the approval gate."""
-    return {"current_assignee": "billing"}
-
-
-def support_node(state: ResolutionState) -> dict[str, Any]:
-    """Support worker. M4 binds the pgvector RAG retriever."""
-    return {"current_assignee": "support"}
-
-
 def auditor_node(state: ResolutionState) -> dict[str, Any]:
     """Human-in-the-loop approval gate. Suspended via ``interrupt_before`` in M5."""
     return {"current_assignee": "auditor"}
@@ -52,6 +44,11 @@ def route_from_supervisor(state: ResolutionState) -> str:
     return END
 
 
+def route_from_billing(state: ResolutionState) -> str:
+    """Escalate to the auditor only when human approval is required."""
+    return "auditor" if state.requires_approval else END
+
+
 def build_workflow() -> StateGraph:
     """Assemble the graph topology (uncompiled)."""
     workflow = StateGraph(ResolutionState)
@@ -67,8 +64,12 @@ def build_workflow() -> StateGraph:
         route_from_supervisor,
         {"billing": "billing", "support": "support", END: END},
     )
-    # Billing may escalate to the auditor for high-value actions (M5).
-    workflow.add_edge("billing", "auditor")
+    # Billing escalates to the auditor only for high-value actions; otherwise ends.
+    workflow.add_conditional_edges(
+        "billing",
+        route_from_billing,
+        {"auditor": "auditor", END: END},
+    )
     workflow.add_edge("support", END)
     workflow.add_edge("auditor", END)
 
