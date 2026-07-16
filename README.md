@@ -91,14 +91,14 @@ ruff check src tests
 
 ## Project status — building toward v1.0
 
-Current milestone: **M2 — MCP tool server hardening** (typed tool contracts,
-central governance policy, and the audit foundation). M1 foundations are done.
+Current milestone: **M3 — Supervisor routing** (structured-output intent
+classification). M1 foundations and M2 tool-server hardening are done.
 
 | Milestone | Scope | Status |
 |---|---|---|
 | M1 | Foundations & infra | ✅ done |
-| M2 | MCP tool server hardening | 🚧 in progress |
-| M3 | Supervisor routing (structured output) | ⬜ |
+| M2 | MCP tool server hardening | ✅ done |
+| M3 | Supervisor routing (structured output) | 🚧 in progress |
 | M4 | Worker agents + pgvector RAG | ⬜ |
 | M5 | Human-in-the-loop approval | ⬜ |
 | M6 | Approval dashboard | ⬜ |

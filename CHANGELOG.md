@@ -7,7 +7,26 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- **M2 — MCP tool server hardening & audit foundation**
+  - Central deterministic governance policy (`src/policy.py`) as the single
+    source of truth for the refund auto-approve threshold.
+  - In-memory mock CRM datastore with VIP / standard / unknown users
+    (`src/mcp_server/mock_crm.py`), including an explicit not-found path.
+  - Typed Pydantic tool contracts and a structured error envelope
+    (`src/mcp_server/models.py`).
+  - Append-only audit logger with recursive PII redaction and email masking
+    (`src/audit/logger.py`); every tool call is now recorded.
+  - `execute_refund` accepts an `idempotency_key` dedupe seam and validates
+    non-positive amounts.
+  - Expanded tests: policy boundaries, audit/redaction, and tool valid/invalid/
+    unknown/boundary cases (26 tests total).
+  - ADR 0005 — typed tool contracts, structured errors, and audit trail.
+
+### Changed
+- MCP tools now return validated Pydantic models instead of raw dicts.
+
 - **M1 — Foundations & infra**
+
   - Repository scaffold with `src/` layout and packaged modules.
   - Centralized environment-driven configuration (`src/config.py`).
   - Strict Pydantic v2 workflow state schema (`src/state.py`).
