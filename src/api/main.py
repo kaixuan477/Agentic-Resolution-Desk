@@ -12,9 +12,11 @@ from __future__ import annotations
 import logging
 from collections.abc import AsyncIterator
 from contextlib import asynccontextmanager, suppress
+from pathlib import Path
 from typing import Annotated
 
 from fastapi import Depends, FastAPI, HTTPException
+from fastapi.staticfiles import StaticFiles
 
 from src.api.schemas import (
     ApprovalRequest,
@@ -103,8 +105,25 @@ def list_pending(service: ServiceDep) -> dict[str, list[str]]:
     return {"pending": service.pending()}
 
 
+@app.get("/pending/details", response_model=list[WorkflowSnapshot])
+def list_pending_details(service: ServiceDep) -> list[WorkflowSnapshot]:
+    """Full snapshots (incl. proposed action) for every pending workflow."""
+    return service.pending_details()
+
+
+@app.get("/workflows/{thread_id}", response_model=WorkflowSnapshot)
+def get_workflow(thread_id: str, service: ServiceDep) -> WorkflowSnapshot:
+    """Return the current snapshot for a single workflow."""
+    return service.get(thread_id)
+
+
 @app.post("/approve", response_model=TicketResponse)
 def approve(request: ApprovalRequest, service: ServiceDep) -> TicketResponse:
     """Resume a suspended workflow with a human decision."""
     snapshot = service.resume(request.thread_id, request.decision)
     return _to_response(snapshot)
+
+
+# Server-rendered reviewer dashboard (no SPA build step). Served at /dashboard/.
+_STATIC_DIR = Path(__file__).parent / "static"
+app.mount("/dashboard", StaticFiles(directory=_STATIC_DIR, html=True), name="dashboard")

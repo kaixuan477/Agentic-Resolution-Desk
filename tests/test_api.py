@@ -60,6 +60,32 @@ def test_invalid_decision_rejected(client: TestClient) -> None:
     assert response.status_code == 422
 
 
+def test_workflow_detail_exposes_proposed_action(client: TestClient) -> None:
+    client.post("/tickets", json={"message": "refund $500 for VIP-01",
+                                 "thread_id": "api-detail"})
+    detail = client.get("/workflows/api-detail")
+    assert detail.status_code == 200
+    body = detail.json()
+    assert body["requires_approval"] is True
+    assert body["proposed_tool"] == "execute_refund"
+    assert body["proposed_user_id"] == "VIP-01"
+    assert body["proposed_amount"] == 500.0
+
+
+def test_pending_details_lists_amounts(client: TestClient) -> None:
+    client.post("/tickets", json={"message": "refund $500 for VIP-01", "thread_id": "d1"})
+    client.post("/tickets", json={"message": "refund $900 for VIP-02", "thread_id": "d2"})
+    details = client.get("/pending/details").json()
+    amounts = sorted(item["proposed_amount"] for item in details)
+    assert amounts == [500.0, 900.0]
+
+
+def test_dashboard_is_served() -> None:
+    dashboard = TestClient(app).get("/dashboard/")
+    assert dashboard.status_code == 200
+    assert "Approval Console" in dashboard.text
+
+
 def test_service_unavailable_returns_503() -> None:
     # No dependency override -> the un-initialized service yields a 503.
     unconfigured = TestClient(app)

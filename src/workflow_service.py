@@ -29,6 +29,11 @@ class WorkflowSnapshot(BaseModel):
     requires_approval: bool
     messages: list[str] = Field(default_factory=list)
 
+    # Details of the action awaiting approval (present when suspended).
+    proposed_tool: str | None = None
+    proposed_user_id: str | None = None
+    proposed_amount: float | None = None
+
 
 class WorkflowService:
     """Coordinates ticket submission and human-in-the-loop approvals."""
@@ -59,10 +64,37 @@ class WorkflowService:
         """Thread ids currently awaiting human approval."""
         return sorted(self._pending)
 
+    def get(self, thread_id: str) -> WorkflowSnapshot:
+        """Return the current snapshot for a single workflow."""
+        return self._snapshot(thread_id)
+
+    def pending_details(self) -> list[WorkflowSnapshot]:
+        """Snapshots for every workflow currently awaiting approval."""
+        return [self._snapshot(tid) for tid in self.pending()]
+
     # -- internals --------------------------------------------------------- #
     @staticmethod
     def _config(thread_id: str) -> dict[str, Any]:
         return {"configurable": {"thread_id": thread_id}}
+
+    @staticmethod
+    def _proposed_fields(proposed: Any) -> tuple[str | None, str | None, float | None]:
+        """Extract (tool, user_id, amount) from a ProposedAction (model or dict)."""
+        if proposed is None:
+            return None, None, None
+        if isinstance(proposed, dict):
+            tool = proposed.get("tool")
+            args = proposed.get("arguments", {})
+        else:  # pydantic ProposedAction
+            tool = getattr(proposed, "tool", None)
+            args = getattr(proposed, "arguments", {})
+        user_id = args.get("user_id") if isinstance(args, dict) else None
+        amount = args.get("amount") if isinstance(args, dict) else None
+        return (
+            str(tool) if tool is not None else None,
+            str(user_id) if user_id is not None else None,
+            float(amount) if amount is not None else None,
+        )
 
     def _snapshot(self, thread_id: str) -> WorkflowSnapshot:
         state = self._app.get_state(self._config(thread_id))
@@ -78,10 +110,14 @@ class WorkflowService:
         messages = [
             str(m.content) for m in values.get("messages", []) if isinstance(m, BaseMessage)
         ]
+        tool, user_id, amount = self._proposed_fields(values.get("proposed_action"))
         return WorkflowSnapshot(
             thread_id=thread_id,
             status="awaiting_approval" if awaiting else "resolved",
             current_assignee=str(values.get("current_assignee", "supervisor")),
             requires_approval=awaiting,
             messages=messages,
+            proposed_tool=tool,
+            proposed_user_id=user_id,
+            proposed_amount=amount,
         )

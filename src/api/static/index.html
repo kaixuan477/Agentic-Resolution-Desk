@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Resolution Desk — Approval Console</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <header>
+      <h1>Approval Console</h1>
+      <p class="subtitle">
+        High-value refunds escalated by the billing agent, awaiting human review.
+      </p>
+      <div class="toolbar">
+        <button id="refresh" type="button">Refresh</button>
+        <span id="status" class="status"></span>
+      </div>
+    </header>
+
+    <main>
+      <section id="empty" class="empty" hidden>
+        <p>No workflows are awaiting approval. 🎉</p>
+      </section>
+      <ul id="queue" class="queue" aria-live="polite"></ul>
+    </main>
+
+    <template id="card-template">
+      <li class="card">
+        <div class="card-head">
+          <span class="tool"></span>
+          <span class="thread"></span>
+        </div>
+        <dl class="fields">
+          <div><dt>User</dt><dd class="user"></dd></div>
+          <div><dt>Amount</dt><dd class="amount"></dd></div>
+        </dl>
+        <p class="message"></p>
+        <div class="actions">
+          <button class="approve" type="button">Approve</button>
+          <button class="deny" type="button">Deny</button>
+        </div>
+      </li>
+    </template>
+
+    <script src="app.js"></script>
+  </body>
+</html>

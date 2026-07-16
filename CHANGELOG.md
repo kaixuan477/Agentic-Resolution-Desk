@@ -7,6 +7,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- **M6 — Approval dashboard**
+  - Server-rendered reviewer console at `/dashboard/` (vanilla HTML/CSS/JS, no
+    SPA build step) that lists pending refunds with user + amount and provides
+    Approve / Deny actions.
+  - `GET /pending/details` (full snapshots incl. the proposed action) and
+    `GET /workflows/{thread_id}` endpoints.
+  - `WorkflowSnapshot` now exposes `proposed_tool`, `proposed_user_id`, and
+    `proposed_amount`, extracted defensively (model or dict) from state.
+  - `WorkflowService.get` / `pending_details` helpers.
+  - Offline API tests for the detail endpoints and the served dashboard
+    (68 tests, +1 skipped integration).
+  - ADR 0009 — server-rendered approval dashboard.
+
 - **M5 — Human-in-the-loop approval**
   - Auditor node (`src/agents/auditor.py`): deterministically applies the human
     reviewer's `approved`/`denied` decision to the escalated refund. Approved
