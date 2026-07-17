@@ -91,9 +91,10 @@ ruff check src tests
 
 ## Project status — building toward v1.0
 
-Current milestone: **M7 — Audit trail & polish → `v1.0.0`**. M1–M6 (foundations,
-tool-server hardening, structured-output supervisor routing, worker agents with
-pgvector RAG, human-in-the-loop approval, and the reviewer dashboard) are done.
+Current milestone: **M7 — Audit trail & polish → `v1.0.0`** (complete). All
+milestones M1–M7 are done: foundations, tool-server hardening, structured-output
+supervisor routing, worker agents with pgvector RAG, human-in-the-loop approval,
+the reviewer dashboard, and the exposed audit trail.
 
 | Milestone | Scope | Status |
 |---|---|---|
@@ -103,7 +104,7 @@ pgvector RAG, human-in-the-loop approval, and the reviewer dashboard) are done.
 | M4 | Worker agents + pgvector RAG | ✅ done |
 | M5 | Human-in-the-loop approval | ✅ done |
 | M6 | Approval dashboard | ✅ done |
-| M7 | Audit + polish → `v1.0.0` | 🚧 in progress |
+| M7 | Audit + polish → `v1.0.0` | ✅ done |
 
 See [CHANGELOG.md](CHANGELOG.md) for released changes.
 

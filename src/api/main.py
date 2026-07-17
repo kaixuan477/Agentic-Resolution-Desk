@@ -20,10 +20,12 @@ from fastapi.staticfiles import StaticFiles
 
 from src.api.schemas import (
     ApprovalRequest,
+    AuditRecord,
     HealthResponse,
     TicketRequest,
     TicketResponse,
 )
+from src.audit.logger import audit_log
 from src.workflow_service import WorkflowService, WorkflowSnapshot
 
 logger = logging.getLogger(__name__)
@@ -122,6 +124,27 @@ def approve(request: ApprovalRequest, service: ServiceDep) -> TicketResponse:
     """Resume a suspended workflow with a human decision."""
     snapshot = service.resume(request.thread_id, request.decision)
     return _to_response(snapshot)
+
+
+@app.get("/audit", response_model=list[AuditRecord])
+def get_audit(
+    user_id: str | None = None,
+    tool: str | None = None,
+    limit: int = 100,
+) -> list[AuditRecord]:
+    """Return the append-only audit trail (records are PII-redacted at write time).
+
+    Optional ``user_id`` / ``tool`` filters narrow the result; ``limit`` returns
+    only the most recent N records. This is a read-only governance view — it does
+    not require the workflow service, only the audit sink.
+    """
+    records = audit_log.records
+    if user_id is not None:
+        records = [r for r in records if r.get("user_id") == user_id]
+    if tool is not None:
+        records = [r for r in records if r.get("tool") == tool]
+    recent = records[-limit:] if limit > 0 else records
+    return [AuditRecord(**r) for r in recent]
 
 
 # Server-rendered reviewer dashboard (no SPA build step). Served at /dashboard/.

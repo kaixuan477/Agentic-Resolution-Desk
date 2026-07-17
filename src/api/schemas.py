@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import Literal
+from typing import Any, Literal
 
 from pydantic import BaseModel, Field
 
@@ -39,3 +39,13 @@ class ApprovalRequest(BaseModel):
 class HealthResponse(BaseModel):
     status: str
     version: str
+
+
+class AuditRecord(BaseModel):
+    """A single append-only audit-trail entry (already PII-redacted at write time)."""
+
+    timestamp: str
+    tool: str
+    user_id: str | None = None
+    arguments: dict[str, Any] = Field(default_factory=dict)
+    result_status: str

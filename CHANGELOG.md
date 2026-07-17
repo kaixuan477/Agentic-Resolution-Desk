@@ -7,6 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- **M7 — Audit trail exposure & v1.0.0 polish**
+  - Read-only audit endpoint `GET /audit` (optional `user_id` / `tool` filters,
+    `limit`) surfacing the append-only, PII-redacted trail of every tool call and
+    governance decision.
+  - `AuditRecord` response schema and a dashboard **Audit Trail** view
+    (`/dashboard/audit.html`) linked from the approval console.
+  - Offline coverage for audit filtering, redaction, and the served view.
+  - ADR 0010 — exposing the audit trail as a governance view.
+  - Completes the v1.0.0 feature set (supervisor/worker agents, sandboxed tools,
+    durable state, human-in-the-loop approval, reviewer + audit dashboards).
+
 - **M6 — Approval dashboard**
   - Server-rendered reviewer console at `/dashboard/` (vanilla HTML/CSS/JS, no
     SPA build step) that lists pending refunds with user + amount and provides

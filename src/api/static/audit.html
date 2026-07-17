@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Resolution Desk — Audit Trail</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <header>
+      <h1>Audit Trail</h1>
+      <p class="subtitle">
+        Append-only record of every tool call and governance decision. Sensitive
+        fields are redacted at write time.
+      </p>
+      <div class="toolbar">
+        <button id="refresh" type="button">Refresh</button>
+        <a class="link" href="index.html">← Approval console</a>
+        <span id="status" class="status"></span>
+      </div>
+    </header>
+
+    <main>
+      <table class="audit">
+        <thead>
+          <tr>
+            <th>Timestamp</th>
+            <th>Tool</th>
+            <th>User</th>
+            <th>Result</th>
+            <th>Arguments</th>
+          </tr>
+        </thead>
+        <tbody id="rows"></tbody>
+      </table>
+    </main>
+
+    <script src="audit.js"></script>
+  </body>
+</html>
