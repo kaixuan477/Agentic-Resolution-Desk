@@ -59,15 +59,28 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
 
     Failure to connect is non-fatal: the health probe still works and the
     workflow endpoints return 503 until a database is available.
+
+    The ``compiled_app`` context manager owns the connection pool, so we hold a
+    reference to it for the whole server lifetime and close it on shutdown.
+    Letting it be garbage-collected would run its ``finally`` and close the pool
+    out from under live requests (``PoolClosed``).
     """
+    graph_cm = None
     with suppress(Exception):
         from src.graph import compiled_app
 
-        graph_app = compiled_app().__enter__()
+        graph_cm = compiled_app()
+        graph_app = graph_cm.__enter__()
         set_service(WorkflowService(graph_app))
         logger.info("Workflow service initialized with Postgres checkpointer.")
-    yield
-    set_service(None)
+    try:
+        yield
+    finally:
+        set_service(None)
+        if graph_cm is not None:
+            with suppress(Exception):
+                graph_cm.__exit__(None, None, None)
+
 
 
 app = FastAPI(

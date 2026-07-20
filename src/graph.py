@@ -103,7 +103,12 @@ def compiled_app() -> Iterator[object]:
     later resume for human approval.
     """
     settings = get_settings()
-    pool = ConnectionPool(conninfo=settings.database_url, max_size=10, open=True)
+    pool = ConnectionPool(
+        conninfo=settings.database_url,
+        max_size=10,
+        open=True,
+        kwargs={"autocommit": True},  # required for setup()'s CREATE INDEX CONCURRENTLY
+    )
     try:
         checkpointer = PostgresSaver(pool)  # type: ignore[arg-type]
         checkpointer.setup()  # idempotent; creates checkpoint tables if absent
