@@ -10,7 +10,7 @@ from __future__ import annotations
 
 from src.rag.policies import get_policy_docs
 
-EMBED_DIM = 1536  # text-embedding-3-small
+EMBED_DIM = 768  # Gemini models/text-embedding-004
 TABLE = "policy_chunks"
 
 
@@ -28,10 +28,10 @@ def _create_table_sql() -> str:
 def ingest_policies(database_url: str) -> int:  # pragma: no cover - requires DB + API
     """Embed and upsert all policy docs into pgvector. Returns rows written."""
     import psycopg
-    from langchain_openai import OpenAIEmbeddings
+    from langchain_google_genai import GoogleGenerativeAIEmbeddings
 
     docs = get_policy_docs()
-    embedder = OpenAIEmbeddings(model="text-embedding-3-small")
+    embedder = GoogleGenerativeAIEmbeddings(model="models/text-embedding-004")
     vectors = embedder.embed_documents([f"{d.title}\n{d.content}" for d in docs])
 
     written = 0

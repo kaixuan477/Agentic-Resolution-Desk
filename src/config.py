@@ -18,9 +18,9 @@ load_dotenv()
 class Settings(BaseModel):
     """Strongly-typed application settings."""
 
-    # LLM
-    openai_api_key: str = os.getenv("OPENAI_API_KEY", "")
-    llm_model: str = os.getenv("LLM_MODEL", "gpt-4o")
+    # LLM (Google Gemini — free tier via Google AI Studio)
+    google_api_key: str = os.getenv("GOOGLE_API_KEY", "")
+    llm_model: str = os.getenv("LLM_MODEL", "gemini-3-flash-preview")
     llm_temperature: float = float(os.getenv("LLM_TEMPERATURE", "0"))
 
     # Database

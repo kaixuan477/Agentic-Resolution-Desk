@@ -69,7 +69,7 @@ is summarized in the **Project status** and roadmap sections below.
 
 ```bash
 # 1. Configure
-cp .env.example .env        # add your OPENAI_API_KEY
+cp .env.example .env        # add your GOOGLE_API_KEY (Gemini, free tier)
 
 # 2. Bring up Postgres (+pgvector), MCP server, and the API
 docker compose up --build

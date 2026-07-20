@@ -10,7 +10,7 @@ dependencies = [
     "langgraph==0.2.60",
     "langgraph-checkpoint-postgres==2.0.9",
     "langchain-core==0.3.28",
-    "langchain-openai==0.2.14",
+    "langchain-google-genai==2.0.7",
     "pydantic==2.10.4",
     "fastapi==0.115.6",
     "uvicorn[standard]==0.34.0",
@@ -60,5 +60,5 @@ ignore_missing_imports = true
 follow_imports = "silent"
 
 [[tool.mypy.overrides]]
-module = ["numpy.*", "langgraph.*", "langchain_core.*", "fastmcp.*", "psycopg_pool.*"]
+module = ["numpy.*", "langgraph.*", "langchain_core.*", "langchain_google_genai.*", "fastmcp.*", "psycopg_pool.*"]
 ignore_errors = true

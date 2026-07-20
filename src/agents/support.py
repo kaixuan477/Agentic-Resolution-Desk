@@ -61,7 +61,7 @@ def _default_answerer() -> Answerer:
     """Pick an answerer: LLM when an API key is set, else extractive."""
     from src.config import get_settings
 
-    return LLMAnswerer() if get_settings().openai_api_key else ExtractiveAnswerer()
+    return LLMAnswerer() if get_settings().google_api_key else ExtractiveAnswerer()
 
 
 def _latest_user_text(state: ResolutionState) -> str:

@@ -30,7 +30,15 @@ def _db_reachable() -> bool:
         return False
 
 
-requires_db = pytest.mark.skipif(not _db_reachable(), reason="No reachable DATABASE_URL")
+def _llm_configured() -> bool:
+    key = os.getenv("GOOGLE_API_KEY", "")
+    return bool(key) and "your-" not in key
+
+
+requires_db = pytest.mark.skipif(
+    not (_db_reachable() and _llm_configured()),
+    reason="Requires a reachable DATABASE_URL and a valid GOOGLE_API_KEY",
+)
 
 
 @requires_db

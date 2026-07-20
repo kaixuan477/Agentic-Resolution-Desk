@@ -3,7 +3,7 @@
 Usage:
     python -m scripts.seed_policies
 
-Requires a reachable ``DATABASE_URL`` and a valid ``OPENAI_API_KEY`` (for
+Requires a reachable ``DATABASE_URL`` and a valid ``GOOGLE_API_KEY`` (for
 embeddings). Safe to re-run — rows are upserted.
 """
 

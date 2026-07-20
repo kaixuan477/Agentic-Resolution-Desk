@@ -76,9 +76,11 @@ class PgVectorRetriever:
     def retrieve(self, query: str, k: int = 3) -> list[RetrievedChunk]:  # pragma: no cover
         # Heavy deps imported lazily so importing this module never requires them.
         import psycopg
-        from langchain_openai import OpenAIEmbeddings
+        from langchain_google_genai import GoogleGenerativeAIEmbeddings
 
-        embedding = OpenAIEmbeddings().embed_query(query)
+        embedding = GoogleGenerativeAIEmbeddings(
+            model="models/text-embedding-004"
+        ).embed_query(query)
         vec = "[" + ",".join(str(x) for x in embedding) + "]"
         sql = (
             f"SELECT doc_id, title, content, 1 - (embedding <=> %s::vector) AS score "

@@ -6,6 +6,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+- **LLM provider swapped from OpenAI to Google Gemini** (free tier via Google
+  AI Studio). Chat uses `gemini-2.0-flash`; RAG embeddings use
+  `text-embedding-004` (768-dim). Configured via `GOOGLE_API_KEY`. Confined to
+  the `get_llm()` seam plus config/embeddings — no agent-logic changes. See
+  ADR 0011.
+
+### Fixed
+- Postgres checkpointer pool now opens connections with `autocommit=True`, so
+  `PostgresSaver.setup()`'s `CREATE INDEX CONCURRENTLY` succeeds.
+- Test suite is now deterministic against an ambient `.env`: an autouse fixture
+  forces offline mode for unit tests, and the durability integration test skips
+  unless both a live database and a valid LLM key are present.
+
 ## [1.0.0]
 
 ### Added
